@@ -1,6 +1,6 @@
 *.o
 extract
 k3-possible-temps
-initial-keys
+key-states
 crc32
 junk

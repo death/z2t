@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall
 LIBS=
 DEPS=common
-TARGETS=extract k3-possible-temps initial-keys crc32
+TARGETS=extract k3-possible-temps key-states crc32
 
 %.o: %.c $(patsubst %, %.h, $(DEPS))
 	$(CC) -c -o $@ $< $(CFLAGS)
