@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-Wall
 LIBS=
-DEPS=
-TARGETS=extract
+DEPS=common
+TARGETS=extract k3-possible-temps
 
 %.o: %.c $(patsubst %, %.h, $(DEPS))
 	$(CC) -c -o $@ $< $(CFLAGS)
