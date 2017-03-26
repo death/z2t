@@ -22,12 +22,15 @@ static void sanity_checks(void)
   }
 }
 
+static void crc32_init(void);
+
 /*
  * Do the setup needed for common operations.
  */
 void setup(void)
 {
   sanity_checks();
+  crc32_init();
 }
 
 /*
@@ -47,4 +50,64 @@ void k3_to_temp_list(unsigned char k3, unsigned short *temps)
       j++;
     }
   }
+}
+
+/*
+ * CRC32 lookup tables.
+ */
+static unsigned int crc32_table[256];
+static unsigned int crc32_inv_table[256];
+
+/*
+ * CRC32 computation without lookup tables.
+ */
+static unsigned int crc32c(unsigned int prevcrc, unsigned char c)
+{
+  int j;
+  unsigned crc = prevcrc;
+
+  crc ^= c;
+  for (j = 0; j < 8; j++) {
+    if (crc & 1) {
+      /*
+       * The appnote refers to 0xDEBB20E3 (section 4.4.7); Biham's
+       * paper gives the right value.
+       */
+      crc = (crc >> 1) ^ 0xEDB88320;
+    } else {
+      crc = crc >> 1;
+    }
+  }
+
+  return crc;
+}
+
+/*
+ * Precompute CRC32 lookup tables.
+ */
+void crc32_init(void)
+{
+  int i;
+
+  for (i = 0; i < 256; i++) {
+    unsigned int j = crc32c(0, i);
+    crc32_table[i] = j;
+    crc32_inv_table[j >> 24] = (j << 8) ^ i;
+  }
+}
+
+/*
+ * Compute the new CRC32 value given the previous value and an octet.
+ */
+unsigned int crc32(unsigned int prevcrc, unsigned char c)
+{
+  return (prevcrc >> 8) ^ crc32_table[(prevcrc & 0xFF) ^ c];
+}
+
+/*
+ * Compute the CRC32 value before it was updated with the octet.
+ */
+unsigned int crc32i(unsigned char nextcrc, unsigned char c)
+{
+  return (nextcrc << 8) ^ crc32_inv_table[(nextcrc >> 24)] ^ c;
 }
