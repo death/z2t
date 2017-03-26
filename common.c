@@ -111,3 +111,55 @@ unsigned int crc32i(unsigned char nextcrc, unsigned char c)
 {
   return (nextcrc << 8) ^ crc32_inv_table[(nextcrc >> 24)] ^ c;
 }
+
+/*
+ * Initialize keys with a password.
+ *
+ * Note that you can pass an empty string to get the hardcoded initial
+ * values.
+ */
+void keys_init(struct keys *s, const char *pass)
+{
+  s->k0 = 0x12345678;
+  s->k1 = 0x23456789;
+  s->k2 = 0x34567890;
+
+  while (*pass) {
+    keys_update(s, *pass);
+    pass++;
+  }
+}
+
+/*
+ * Get current keystream octet given keys state.
+ */
+unsigned char keys_k3(struct keys *s)
+{
+  /* We follow Biham in IORing with 3 rather than 2. */
+  unsigned short temp = (s->k2 & 0xFFFF) | 3;
+  return (temp * (temp ^ 1)) >> 8;
+}
+
+/*
+ * Update keys state given an octet.
+ */
+void keys_update(struct keys *s, unsigned char c)
+{
+  s->k0 = crc32(s->k0, c);
+  s->k1 = s->k1 + (s->k0 & 0xFF);
+  s->k1 = s->k1 * 0x08088405 + 1;
+  s->k2 = crc32(s->k2, s->k1 >> 24);
+}
+
+/*
+ * Crypt a buffer, updating the keys state on the way.
+ */
+void keys_crypt(struct keys *s, unsigned char *out, unsigned char *in, int size)
+{
+  int i;
+
+  for (i = 0; i < size; i++) {
+    out[i] = in[i] ^ keys_k3(s);
+    keys_update(s, out[i]);
+  }
+}
