@@ -10,7 +10,7 @@
 int main(int argc, char *argv[])
 {
     unsigned char k3;
-    unsigned short temps[64];
+    const unsigned short *temps;
     int i;
 
     setup();
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     }
 
     k3 = (unsigned char)atoi(argv[1]);
-    k3_to_temp_list(k3, temps);
+    temps = temp_candidates(k3);
 
     for (i = 0; i < 64; i++) {
         printf("%04X\n", temps[i]);

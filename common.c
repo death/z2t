@@ -23,6 +23,7 @@ static void sanity_checks(void)
 }
 
 static void crc32_init(void);
+static void temp_candidates_init(void);
 
 /*
  * Do the setup needed for common operations.
@@ -31,25 +32,44 @@ void setup(void)
 {
     sanity_checks();
     crc32_init();
+    temp_candidates_init();
 }
 
 /*
- * Produce the 64 possible values of temp, given a particular k3
- * value.
+ * Temp candidates lookup tables.
  */
-void k3_to_temp_list(unsigned char k3, unsigned short *temps)
-{
-    int i;
-    int j;
+static unsigned short temp_candidates_table[256][64];
 
-    for (i = 0, j = 0; i < (1 << 14); i++) {
-        unsigned short temp = ((i & 0xFFFF) << 2) | 3;
-        unsigned char d = (temp * (temp ^ 1)) >> 8;
-        if (d == k3) {
-            temps[j] = temp;
-            j++;
+/*
+ * Precompute temp candidates for each possible K3 value.
+ */
+void temp_candidates_init(void)
+{
+    unsigned char k3 = 0;
+
+    do {
+        int i;
+        int j;
+
+        for (i = 0, j = 0; i < (1 << 14); i++) {
+            unsigned short temp = ((i & 0xFFFF) << 2) | 3;
+            unsigned char d = (temp * (temp ^ 1)) >> 8;
+            if (d == k3) {
+                temp_candidates_table[k3][j] = temp;
+                j++;
+            }
         }
-    }
+
+        k3++;
+    } while (k3 != 0);
+}
+
+/*
+ * Return the 64 possible temp values for a particular K3 value.
+ */
+const unsigned short *temp_candidates(unsigned char k3)
+{
+    return temp_candidates_table[k3];
 }
 
 /*

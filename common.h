@@ -2,7 +2,8 @@
 #define Z2T_INC_COMMON_H
 
 void setup(void);
-void k3_to_temp_list(unsigned char k3, unsigned short *temps);
+
+const unsigned short *temp_candidates(unsigned char k3);
 
 unsigned int crc32(unsigned int prevcrc, unsigned char c);
 unsigned int crc32i(unsigned int nextcrc, unsigned char c);
