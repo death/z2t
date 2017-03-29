@@ -9,23 +9,23 @@
 
 int main(int argc, char *argv[])
 {
-  unsigned char k3;
-  unsigned short temps[64];
-  int i;
+    unsigned char k3;
+    unsigned short temps[64];
+    int i;
 
-  setup();
+    setup();
 
-  if (argc < 2) {
-    fprintf(stderr, "usage: k3-possible-temps <k3>\n");
-    return 1;
-  }
+    if (argc < 2) {
+        fprintf(stderr, "usage: k3-possible-temps <k3>\n");
+        return 1;
+    }
 
-  k3 = (unsigned char)atoi(argv[1]);
-  k3_to_temp_list(k3, temps);
+    k3 = (unsigned char)atoi(argv[1]);
+    k3_to_temp_list(k3, temps);
 
-  for (i = 0; i < 64; i++) {
-    printf("%04X\n", temps[i]);
-  }
+    for (i = 0; i < 64; i++) {
+        printf("%04X\n", temps[i]);
+    }
 
-  return 0;
+    return 0;
 }

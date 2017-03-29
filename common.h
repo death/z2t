@@ -9,9 +9,9 @@ unsigned int crc32i(unsigned char nextcrc, unsigned char c);
 
 struct keys
 {
-  unsigned int k0;
-  unsigned int k1;
-  unsigned int k2;
+    unsigned int k0;
+    unsigned int k1;
+    unsigned int k2;
 };
 
 void keys_init(struct keys *s, const char *pass);

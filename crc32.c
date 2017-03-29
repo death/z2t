@@ -8,18 +8,18 @@
 
 int main(void)
 {
-  int c;
-  unsigned int crc = 0xFFFFFFFF;
+    int c;
+    unsigned int crc = 0xFFFFFFFF;
 
-  setup();
+    setup();
 
-  while ((c = fgetc(stdin)) != EOF) {
-    crc = crc32(crc, (unsigned char)c);
-  }
+    while ((c = fgetc(stdin)) != EOF) {
+        crc = crc32(crc, (unsigned char)c);
+    }
 
-  crc = ~crc;
+    crc = ~crc;
 
-  printf("%08X\n", crc);
+    printf("%08X\n", crc);
 
-  return 0;
+    return 0;
 }
