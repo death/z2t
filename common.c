@@ -107,7 +107,7 @@ unsigned int crc32(unsigned int prevcrc, unsigned char c)
 /*
  * Compute the CRC32 value before it was updated with the octet.
  */
-unsigned int crc32i(unsigned char nextcrc, unsigned char c)
+unsigned int crc32i(unsigned int nextcrc, unsigned char c)
 {
     return (nextcrc << 8) ^ crc32_inv_table[(nextcrc >> 24)] ^ c;
 }
