@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    k3 = (unsigned char)atoi(argv[1]);
+    k3 = (unsigned char)strtoul(argv[1], 0, 16);
     temps = temp_candidates(k3);
 
     for (i = 0; i < 64; i++) {
