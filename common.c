@@ -183,3 +183,30 @@ void keys_crypt(struct keys *s, unsigned char *out, unsigned char *in, int size)
         keys_update(s, out[i]);
     }
 }
+
+/*
+ * Compute possible candidates for the previous K2 value (the 30 most
+ * significant bits of it, actually), given a particular K2 value and
+ * the previous K3 value.
+ *
+ * The output buffer should have capacity for 64 elements.  The number
+ * of candidates filled out is returned.
+ */
+int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
+{
+    unsigned int rhs = crc32i(k2 & 0xFFFFFFFC, 0) & 0xFFFFFC00;
+    const unsigned short *temps = temp_candidates(k3p);
+    int i;
+    int j;
+
+    for (i = 0, j = 0; i < 64; i++) {
+        unsigned int lhs = temps[i];
+
+        if ((rhs & 0x0000FC00) == (lhs & 0x0000FC00)) {
+            out[j] = (rhs | lhs) & 0xFFFFFFFC;
+            j++;
+        }
+    }
+
+    return j;
+}

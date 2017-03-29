@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall
 LIBS=
 DEPS=common
-TARGETS=extract temp-candidates key-states crc32
+TARGETS=extract temp-candidates key-states crc32 k2p-candidates
 
 %.o: %.c $(patsubst %, %.h, $(DEPS))
 	$(CC) -c -o $@ $< $(CFLAGS)
