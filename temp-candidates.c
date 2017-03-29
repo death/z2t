@@ -1,6 +1,6 @@
 /*
- * k3-possible-temps - Print the possible values of temp given a
- * particular k3 value.
+ * temp-candidates - Print the possible values of temp given a
+ * particular K3 value.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     setup();
 
     if (argc < 2) {
-        fprintf(stderr, "usage: k3-possible-temps <k3>\n");
+        fprintf(stderr, "usage: temp-candidates <k3>\n");
         return 1;
     }
 
