@@ -4,4 +4,5 @@ temp-candidates
 key-states
 crc32
 junk
-k2p-candidates
+k2-initial-candidates
+k2-prev-candidates
