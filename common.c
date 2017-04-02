@@ -73,6 +73,22 @@ const unsigned short *temp_candidates(unsigned char k3)
 }
 
 /*
+ * Return the successor of k1 in the series.
+ */
+unsigned int lcg(unsigned int k1)
+{
+    return k1 * 0x08088405 + 1;
+}
+
+/*
+ * Return the predecessor of k1 in the series.
+ */
+unsigned int lcgi(unsigned int k1)
+{
+    return (k1 - 1) * 0xD94FA8CD;
+}
+
+/*
  * CRC32 lookup tables.
  */
 static unsigned int crc32_table[256];
@@ -166,8 +182,7 @@ unsigned char keys_k3(struct keys *s)
 void keys_update(struct keys *s, unsigned char c)
 {
     s->k0 = crc32(s->k0, c);
-    s->k1 = s->k1 + (s->k0 & 0xFF);
-    s->k1 = s->k1 * 0x08088405 + 1;
+    s->k1 = lcg(s->k1 + (s->k0 & 0xFF));
     s->k2 = crc32(s->k2, s->k1 >> 24);
 }
 

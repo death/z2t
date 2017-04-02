@@ -6,6 +6,9 @@ void setup(void);
 const unsigned short *temp_candidates(unsigned char k3);
 int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out);
 
+unsigned int lcg(unsigned int k1);
+unsigned int lcgi(unsigned int k1);
+
 unsigned int crc32(unsigned int prevcrc, unsigned char c);
 unsigned int crc32i(unsigned int nextcrc, unsigned char c);
 
