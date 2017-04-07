@@ -110,10 +110,6 @@ int read_file_entry(FILE *stream, struct file_entry *e)
     if (gpflag & (1 << 0)) {
         e->flags |= FILE_ENCRYPTED;
     }
-    if (gpflag & (1 << 3)) {
-        /* TODO: use values in data descriptor. */
-        return -1;
-    }
 
     /* Read compression method; 0x0008 = deflate. */
     u16(stream);
@@ -127,8 +123,15 @@ int read_file_entry(FILE *stream, struct file_entry *e)
 
     /* Read compressed size, including encryption header if exists. */
     e->compressed_size = u32(stream);
-    if (e->compressed_size == 0xFFFFFFFF) {
-        /* TODO: support zip64. */
+    switch (e->compressed_size) {
+    case 0:
+        /*
+         * Compressed size may be specified in data descriptor, but
+         * this is not (yet) implemented.
+         */
+        return -1;
+    case 0xFFFFFFFF:
+        /* Support for ZIP64 is not (yet) implemented. */
         return -1;
     }
 
