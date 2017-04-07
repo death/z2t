@@ -4,7 +4,7 @@ LIBS=
 DEPS=common
 TARGETS=extract temp-candidates key-states crc32 k2-initial-candidates \
 	k2-prev-candidates k1-msb k1-08088405-inv k1-candidate-lists \
-	k0-reconstruct-list k0-recover-4
+	k0-reconstruct-list k0-recover-4 key-prev-state
 
 %.o: %.c $(patsubst %, %.h, $(DEPS))
 	$(CC) -c -o $@ $< $(CFLAGS)
