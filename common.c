@@ -36,6 +36,24 @@ void setup(void)
 }
 
 /*
+ * Parse octets encoded as hex values in the arguments vector until
+ * there are no more arguments left or MAX_BYTES values have been
+ * parsed.  Return the number of values parsed.
+ *
+ * The output buffer should have capacity of MAX_BYTES.
+ */
+int parse_hex_bytes(char **argv, unsigned char *out)
+{
+    int i;
+
+    for (i = 0; argv[i] && i < MAX_BYTES; i++) {
+        out[i] = (unsigned char)strtoul(argv[i], 0, 16);
+    }
+
+    return i;
+}
+
+/*
  * Temp candidates lookup tables.
  */
 static unsigned short temp_candidates_table[256][64];
@@ -207,7 +225,7 @@ void keys_crypt(struct keys *s, unsigned char *out, unsigned char *in, int size)
  * The output buffer should have capacity for 64 elements.  The number
  * of candidates filled out is returned.
  */
-int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
+static int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
 {
     unsigned int rhs = crc32i(k2 & 0xFFFFFFFC, 0) & 0xFFFFFC00;
     const unsigned short *temps = temp_candidates(k3p);
@@ -230,7 +248,7 @@ int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
  * Compute the 2^22 candidates for K2 given a K3 value (the 30 most
  * significant bits of each, actually).
  */
-void k2_candidates_initial(unsigned char k3, unsigned int *out)
+static void k2_candidates_initial(unsigned char k3, unsigned int *out)
 {
     const unsigned short *temps = temp_candidates(k3);
     int i;
@@ -257,7 +275,7 @@ void k2_candidates_initial(unsigned char k3, unsigned int *out)
  * The output buffer should have capacity for 2^22 candidates.  It may
  * contain duplicates, which can later be removed.
  */
-int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsigned int *out)
+static int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsigned int *out)
 {
     int i;
     unsigned int *out0 = out;
@@ -273,4 +291,67 @@ int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsig
     }
 
     return out - out0;
+}
+
+static int k2_remove_duplicates(unsigned int *in, int inlen, unsigned int *out);
+
+/*
+ * Compute possible K2 candidates for initial K3 value, given a list
+ * of K3 values.  Returns a pointer to the array of candidates, and
+ * sets *outlen to its size.
+ */
+unsigned int *k2_candidates(unsigned char *k3, int k3len, int *outlen)
+{
+    static unsigned int candidates[1 << 22];
+    static unsigned int temp[1 << 22];
+    int i;
+    int n = 0;
+
+    for (i = k3len - 1; i >= 0; i--) {
+        if (i == k3len - 1) {
+            k2_candidates_initial(k3[i], candidates);
+            n = 1 << 22;
+        } else {
+            int m = k2_candidates_previous(k3[i], candidates, n, temp);
+            n = k2_remove_duplicates(temp, m, candidates);
+        }
+    }
+
+    *outlen = n;
+    return candidates;
+}
+
+static int k2_compare(const void *a, const void *b);
+
+/*
+ * Remove duplicate K2 values.
+ */
+int k2_remove_duplicates(unsigned int *in, int inlen, unsigned int *out)
+{
+    int i;
+    unsigned int *out0 = out;
+
+    qsort(in, inlen, sizeof(unsigned int), k2_compare);
+    for (i = 0; i < inlen; i++) {
+        if (i == 0 || in[i - 1] != in[i]) {
+            *out++ = in[i];
+        }
+    }
+
+    return out - out0;
+}
+
+/*
+ * Comparison function for sorting K2 values.
+ */
+int k2_compare(const void *a, const void *b)
+{
+    unsigned int x = *(unsigned int *)a;
+    unsigned int y = *(unsigned int *)b;
+    if (x < y)
+        return -1;
+    else if (x > y)
+        return 1;
+    else
+        return 0;
 }

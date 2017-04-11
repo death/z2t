@@ -4,17 +4,15 @@
  * known to last known).
  */
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "common.h"
 
-int remove_duplicates(unsigned int *in, int inlen, unsigned int *out);
-
 int main(int argc, char *argv[])
 {
-    static unsigned int candidates[1 << 22];
-    static unsigned int temp[1 << 22];
-    int n;
+    unsigned char k3[MAX_BYTES];
+    unsigned int *k2;
+    int numk3;
+    int numk2;
     int i;
 
     if (argc < 2) {
@@ -24,49 +22,12 @@ int main(int argc, char *argv[])
 
     setup();
 
-    for (i = argc - 1; i > 0; i--) {
-        unsigned char k3 = (unsigned char)strtoul(argv[i], 0, 16);
-        if (i == argc - 1) {
-            k2_candidates_initial(k3, candidates);
-            n = 1 << 22;
-        } else {
-            int m = k2_candidates_previous(k3, candidates, n, temp);
-            n = remove_duplicates(temp, m, candidates);
-        }
-    }
+    numk3 = parse_hex_bytes(&argv[1], k3);
+    k2 = k2_candidates(k3, numk3, &numk2);
 
-    for (i = 0; i < n; i++) {
-        printf("%08X\n", candidates[i]);
+    for (i = 0; i < numk2; i++) {
+        printf("%08X\n", k2[i]);
     }
 
     return 0;
-}
-
-static int compare(const void *a, const void *b);
-
-int remove_duplicates(unsigned int *in, int inlen, unsigned int *out)
-{
-    int i;
-    unsigned int *out0 = out;
-
-    qsort(in, inlen, sizeof(unsigned int), compare);
-    for (i = 0; i < inlen; i++) {
-        if (i == 0 || in[i - 1] != in[i]) {
-            *out++ = in[i];
-        }
-    }
-
-    return out - out0;
-}
-
-int compare(const void *a, const void *b)
-{
-    unsigned int x = *(unsigned int *)a;
-    unsigned int y = *(unsigned int *)b;
-    if (x < y)
-        return -1;
-    else if (x > y)
-        return 1;
-    else
-        return 0;
 }

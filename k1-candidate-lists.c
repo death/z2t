@@ -7,22 +7,17 @@
  * This isn't 1994 - we don't need no lookup tables.
  */
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "common.h"
-
-enum {
-    MAXK1 = 256
-};
 
 void follow(unsigned int *k1, unsigned char *msb, int i, int len);
 
 int main(int argc, char *argv[])
 {
-    unsigned char msb[MAXK1];
-    unsigned int k1[MAXK1];
+    unsigned char msb[MAX_BYTES];
+    unsigned int k1[MAX_BYTES];
     unsigned int i;
-    int len = 0;
+    int len;
 
     setup();
 
@@ -31,12 +26,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    for (i = 1; i < argc; i++) {
-        msb[len++] = (unsigned char)strtoul(argv[i], 0, 16);
-        if (len == MAXK1) {
-            break;
-        }
-    }
+    len = parse_hex_bytes(&argv[1], msb);
 
     for (i = 0; i < (1 << 24); i++) {
         k1[0] = (msb[0] << 24) | i;

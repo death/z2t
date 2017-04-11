@@ -3,10 +3,14 @@
 
 void setup(void);
 
+enum {
+    MAX_BYTES = 256
+};
+
+int parse_hex_bytes(char **argv, unsigned char *out);
+
 const unsigned short *temp_candidates(unsigned char k3);
-int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out);
-void k2_candidates_initial(unsigned char k3, unsigned int *out);
-int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsigned int *out);
+unsigned int *k2_candidates(unsigned char *k3, int k3len, int *outlen);
 
 unsigned int lcg(unsigned int k1);
 unsigned int lcgi(unsigned int k1);
