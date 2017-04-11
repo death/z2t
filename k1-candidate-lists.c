@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     setup();
 
     if (argc < 3) {
-        fprintf(stderr, "usage: k1-candidate-pairs <k1msb> <k1pmsb> [k1ppmsb] ...\n");
+        fprintf(stderr, "usage: k1-candidate-lists <k1msb> <k1pmsb> [k1ppmsb] ...\n");
         return 1;
     }
 
