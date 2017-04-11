@@ -248,3 +248,29 @@ void k2_candidates_initial(unsigned char k3, unsigned int *out)
         } while (k2msbs != 0);
     }
 }
+
+/*
+ * Compute the previous K2 value candidates given a list of K2
+ * candidates and a previous K3 value.  The new number of candidates
+ * is returned.
+ *
+ * The output buffer should have capacity for 2^22 candidates.  It may
+ * contain duplicates, which can later be removed.
+ */
+int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsigned int *out)
+{
+    int i;
+    unsigned int *out0 = out;
+
+    for (i = 0; i < inlen; i++) {
+        unsigned int k2 = in[i];
+        unsigned int k2p[64];
+        int numk2p = k2p_candidates(k2, k3p, k2p);
+        int j;
+        for (j = 0; j < numk2p; j++) {
+            *out++ = k2p[j];
+        }
+    }
+
+    return out - out0;
+}

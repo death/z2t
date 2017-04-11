@@ -71,3 +71,20 @@
     86 18 F8 A5 2C 18 72 92
 
   Last keystream byte for enc is BB^E0 = 5B.
+
+* Step 1 - K2 candidates
+
+  Compute K2 candidates (30 most significant bits of each, actually)
+  at message start, given known keystream bytes:
+
+  #+BEGIN_SRC sh
+  ./k2-candidates 03 16 D5 C0 4B C2 05 EC 33 BF 9C D4 FA 3D DC 95 B5 54 E9 56 37 48 A8 4B 86 18 F8 A5 2C 18 72 92 > /tmp/k2_12
+  #+END_SRC
+
+  How many candidates?
+
+  #+BEGIN_SRC sh
+  wc -l /tmp/k2_12
+  #+END_SRC
+
+  255862 (approx 2^18).
