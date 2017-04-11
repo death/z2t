@@ -1,0 +1,73 @@
+* Step 0 - Generating inputs
+
+  Generate message:
+
+  #+BEGIN_SRC sh
+  ./flow-gen-message > message.pgm
+  #+END_SRC
+
+  Zip it without a password to get plaintext:
+
+  #+BEGIN_SRC sh
+  zip nopass.zip message.pgm
+  #+END_SRC
+
+  Extract values of interest:
+
+  #+BEGIN_SRC sh
+  ./extract nopass.zip
+  #+END_SRC
+
+  (name "message.pgm"
+   crc #x255BDEE0
+   csize 17093
+   usize 307215
+   initial #(#xED #x9D #x2B #x90 #xE4 #xBA #xB6 #xA6
+             #x85 #x0E #x38 #x71 #xD0 #x41 #x8D #x0A
+             #x15 #x4A #x94 #x31 #x71 #xAF #x63 #x80
+             #x91 #x91 #x91 #x63 #x80 #x91 #x91 #x90))
+
+  Zip with a password to get ciphertext:
+
+  #+BEGIN_SRC sh
+  zip -e -P secret pass.zip message.pgm
+  #+END_SRC
+
+  Extract values of interest:
+
+  #+BEGIN_SRC sh
+  ./extract pass.zip
+  #+END_SRC
+
+  (name "message.pgm"
+   crc #x255BDEE0
+   csize 17093
+   usize 307215
+   enc #(#xAB #x48 #x72 #x45 #x53 #xC5 #x43 #x2A
+         #x13 #xBC #xBB #xBB)
+   initial #(#xEE #x8B #xFE #x50 #xAF #x78 #xB3 #x4A
+             #xB6 #xB1 #xA4 #xA5 #x2A #x7C #x51 #x9F
+             #xA0 #x1E #x7D #x67 #x46 #xE7 #xCB #xCB
+             #x17 #x89 #x69 #xC6 #xAC #x89 #xE3 #x02))
+
+  Summary:
+
+  Known plaintext:
+    ED 9D 2B 90 E4 BA B6 A6
+    85 0E 38 71 D0 41 8D 0A
+    15 4A 94 31 71 AF 63 80
+    91 91 91 63 80 91 91 90
+
+  Ciphertext (not including first 12 bytes):
+    EE 8B FE 50 AF 78 B3 4A
+    B6 B1 A4 A5 2A 7C 51 9F
+    A0 1E 7D 67 46 E7 CB CB
+    17 89 69 C6 AC 89 E3 02
+
+  Deduced keystream bytes (P^C; K3 values):
+    03 16 D5 C0 4B C2 05 EC
+    33 BF 9C D4 FA 3D DC 95
+    B5 54 E9 56 37 48 A8 4B
+    86 18 F8 A5 2C 18 72 92
+
+  Last keystream byte for enc is BB^E0 = 5B.
