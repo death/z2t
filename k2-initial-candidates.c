@@ -10,8 +10,8 @@
 int main(int argc, char *argv[])
 {
     unsigned char k3;
-    const unsigned short *temps;
     int i;
+    static unsigned int k2[1 << 22];
 
     setup();
 
@@ -21,19 +21,10 @@ int main(int argc, char *argv[])
     }
 
     k3 = (unsigned char)strtoul(argv[1], 0, 16);
-    temps = temp_candidates(k3);
+    k2_candidates_initial(k3, k2);
 
-    for (i = 0; i < 64; i++) {
-        unsigned short temp = temps[i];
-        unsigned short k2msbs = 0;
-
-        do {
-            unsigned int k2 = k2msbs;
-            k2 <<= 16;
-            k2 |= temp;
-            printf("%08X\n", k2);
-            k2msbs++;
-        } while (k2msbs != 0);
+    for (i = 0; i < (1 << 22); i++) {
+        printf("%08X\n", k2[i]);
     }
 
     return 0;

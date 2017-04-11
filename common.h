@@ -5,6 +5,7 @@ void setup(void);
 
 const unsigned short *temp_candidates(unsigned char k3);
 int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out);
+void k2_candidates_initial(unsigned char k3, unsigned int *out);
 
 unsigned int lcg(unsigned int k1);
 unsigned int lcgi(unsigned int k1);

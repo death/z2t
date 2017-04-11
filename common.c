@@ -225,3 +225,26 @@ int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
 
     return j;
 }
+
+/*
+ * Compute the 2^22 candidates for K2 given a K3 value (the 30 most
+ * significant bits of each, actually).
+ */
+void k2_candidates_initial(unsigned char k3, unsigned int *out)
+{
+    const unsigned short *temps = temp_candidates(k3);
+    int i;
+
+    for (i = 0; i < 64; i++) {
+        unsigned short temp = temps[i];
+        unsigned short k2msbs = 0;
+
+        do {
+            unsigned int k2 = k2msbs;
+            k2 <<= 16;
+            k2 |= temp;
+            *out++ = k2;
+            k2msbs++;
+        } while (k2msbs != 0);
+    }
+}
