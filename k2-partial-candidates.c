@@ -1,7 +1,7 @@
 /*
- * k2-candidates - Print K2 candidates (30 most significant bits of
- * each, actually) given a sequence of K3 values (ordered from first
- * known to last known).
+ * k2-partial-candidates - Print K2 partial candidates (30 most
+ * significant bits of each) given a sequence of K3 values (ordered
+ * from first known to last known).
  */
 #include <stdio.h>
 
@@ -16,14 +16,14 @@ int main(int argc, char *argv[])
     int i;
 
     if (argc < 2) {
-        fprintf(stderr, "usage: k2-candidates <k3_0> [k3_1] ...\n");
+        fprintf(stderr, "usage: k2-partial-candidates <k3_0> [k3_1] ...\n");
         return 1;
     }
 
     setup();
 
     numk3 = parse_hex_bytes(&argv[1], k3);
-    k2 = k2_candidates(k3, numk3, &numk2);
+    k2 = k2_partial_candidates(k3, numk3, &numk2);
 
     for (i = 0; i < numk2; i++) {
         printf("%08X\n", k2[i]);

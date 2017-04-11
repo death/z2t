@@ -74,14 +74,13 @@
 
 * Step 1 - K2 candidates
 
-  Compute K2 candidates (30 most significant bits of each, actually)
-  at message start, given known keystream bytes:
+  Compute partial K2 candidates (30 most significant bits of each) for
+  the 13th known byte:
 
   #+BEGIN_SRC sh
-  ./k2-candidates 03 16 D5 C0 4B C2 05 EC \
-                  33 BF 9C D4 FA 3D DC 95 \
-                  B5 54 E9 56 37 48 A8 4B \
-                  86 18 F8 A5 2C 18 72 92 > /tmp/k2_12
+  ./k2-partial-candidates FA 3D DC 95 B5 54 E9 56 \
+                          37 48 A8 4B 86 18 F8 A5 \
+                          2C 18 72 92 > /tmp/k2_13
   #+END_SRC
 
-  This gives 255862 (approx 2^18) candidates.
+  This gives 388371 (between 2^18 and 2^19) partial candidates.

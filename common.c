@@ -218,14 +218,13 @@ void keys_crypt(struct keys *s, unsigned char *out, unsigned char *in, int size)
 }
 
 /*
- * Compute possible candidates for the previous K2 value (the 30 most
- * significant bits of it, actually), given a particular K2 value and
- * the previous K3 value.
+ * Compute possible partial candidates for the previous K2 value,
+ * given a particular K2 value and the previous K3 value.
  *
  * The output buffer should have capacity for 64 elements.  The number
  * of candidates filled out is returned.
  */
-static int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
+static int k2p_partial_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
 {
     unsigned int rhs = crc32i(k2 & 0xFFFFFFFC, 0) & 0xFFFFFC00;
     const unsigned short *temps = temp_candidates(k3p);
@@ -245,10 +244,9 @@ static int k2p_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
 }
 
 /*
- * Compute the 2^22 candidates for K2 given a K3 value (the 30 most
- * significant bits of each, actually).
+ * Compute the 2^22 partial candidates for K2 given a K3 value.
  */
-static void k2_candidates_initial(unsigned char k3, unsigned int *out)
+static void k2_partial_candidates_initial(unsigned char k3, unsigned int *out)
 {
     const unsigned short *temps = temp_candidates(k3);
     int i;
@@ -268,14 +266,14 @@ static void k2_candidates_initial(unsigned char k3, unsigned int *out)
 }
 
 /*
- * Compute the previous K2 value candidates given a list of K2
+ * Compute the previous K2's partial candidates given a list of K2
  * candidates and a previous K3 value.  The new number of candidates
  * is returned.
  *
  * The output buffer should have capacity for 2^22 candidates.  It may
  * contain duplicates, which can later be removed.
  */
-static int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsigned int *out)
+static int k2_partial_candidates_previous(unsigned char k3p, unsigned int *in, int inlen, unsigned int *out)
 {
     int i;
     unsigned int *out0 = out;
@@ -283,7 +281,7 @@ static int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen
     for (i = 0; i < inlen; i++) {
         unsigned int k2 = in[i];
         unsigned int k2p[64];
-        int numk2p = k2p_candidates(k2, k3p, k2p);
+        int numk2p = k2p_partial_candidates(k2, k3p, k2p);
         int j;
         for (j = 0; j < numk2p; j++) {
             *out++ = k2p[j];
@@ -296,11 +294,11 @@ static int k2_candidates_previous(unsigned char k3p, unsigned int *in, int inlen
 static int k2_remove_duplicates(unsigned int *in, int inlen, unsigned int *out);
 
 /*
- * Compute possible K2 candidates for initial K3 value, given a list
- * of K3 values.  Returns a pointer to the array of candidates, and
- * sets *outlen to its size.
+ * Compute K2 partial candidates (the 30 most significant bits for
+ * each) for initial K3 value, given a list of K3 values.  Returns a
+ * pointer to the array of candidates, and sets *outlen to its size.
  */
-unsigned int *k2_candidates(unsigned char *k3, int k3len, int *outlen)
+unsigned int *k2_partial_candidates(unsigned char *k3, int k3len, int *outlen)
 {
     static unsigned int candidates[1 << 22];
     static unsigned int temp[1 << 22];
@@ -309,10 +307,10 @@ unsigned int *k2_candidates(unsigned char *k3, int k3len, int *outlen)
 
     for (i = k3len - 1; i >= 0; i--) {
         if (i == k3len - 1) {
-            k2_candidates_initial(k3[i], candidates);
+            k2_partial_candidates_initial(k3[i], candidates);
             n = 1 << 22;
         } else {
-            int m = k2_candidates_previous(k3[i], candidates, n, temp);
+            int m = k2_partial_candidates_previous(k3[i], candidates, n, temp);
             n = k2_remove_duplicates(temp, m, candidates);
         }
     }
