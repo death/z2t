@@ -83,4 +83,11 @@
                           2C 18 72 92 > /tmp/k2_13
   #+END_SRC
 
-  This gives 388371 (between 2^18 and 2^19) partial candidates.
+  This gives 388371 (between 2^18 and 2^19) partial candidates.  Now
+  obtain complete candidate (except the first value) lists for each:
+
+  #+BEGIN_SRC sh
+  ./k2-candidate-lists 5B 03 16 D5 C0 4B C2 05 EC 33 BF 9C D4 < /tmp/k2_13 > /tmp/k2lists
+  #+END_SRC
+
+  This gives 386475 candidate lists.

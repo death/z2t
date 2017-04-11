@@ -224,7 +224,7 @@ void keys_crypt(struct keys *s, unsigned char *out, unsigned char *in, int size)
  * The output buffer should have capacity for 64 elements.  The number
  * of candidates filled out is returned.
  */
-static int k2p_partial_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
+int k2p_partial_candidates(unsigned int k2, unsigned char k3p, unsigned int *out)
 {
     unsigned int rhs = crc32i(k2 & 0xFFFFFFFC, 0) & 0xFFFFFC00;
     const unsigned short *temps = temp_candidates(k3p);
