@@ -353,3 +353,72 @@ int k2_compare(const void *a, const void *b)
     else
         return 0;
 }
+
+
+/*
+ * Dump a sequence of values to standard output.
+ */
+void list_dump(void *context, unsigned int *list, int len)
+{
+    int i;
+    (void)context;
+    for (i = 0; i < len; i++) {
+        printf("%08X%c", list[i], i == len - 1 ? '\n' : ' ');
+    }
+}
+
+static void k2_candidate_lists_aux(unsigned int *k2, unsigned char *k3, int i, int len, void *context, list_receiver receiver);
+
+/*
+ * Given a K2 partial candidate and a sequence of K3 values (capped at
+ * MAX_BYTES), generate sequences containing complete K2 values
+ * (except the first one, which will be partial).  Each sequence is a
+ * candidate for being the true K2 sequence, and the list receiver
+ * will be called with it.
+ */
+void k2_candidate_lists(unsigned int k2partial, unsigned char *k3, int k3len, void *context, list_receiver receiver)
+{
+    unsigned int k2[MAX_BYTES + 1];
+    k2[k3len] = k2partial & 0xFFFFFFFC;
+    k2_candidate_lists_aux(k2, k3, k3len, k3len + 1, context, receiver);
+}
+
+/*
+ * Use k3[i-1] to compute a new partial candidate in k2[i-1] and
+ * complete the partial candidate in k2[i].
+ *
+ * When there are no more candidates to complete, call the list
+ * receiver with the list.
+ */
+void k2_candidate_lists_aux(unsigned int *k2, unsigned char *k3, int i, int len, void *context, list_receiver receiver)
+{
+    unsigned int k2save = k2[i];
+    unsigned int k2p[64];
+    int numk2p = k2p_partial_candidates(k2[i], k3[i - 1], k2p);
+    int j;
+    for (j = 0; j < numk2p; j++) {
+        k2[i] = k2save;
+        k2[i - 1] = k2p[j];
+
+        /*
+         * It may be possible to use a simpler computation here, but
+         * who cares?
+         */
+        int lsbs;
+        for (lsbs = 0; lsbs < 4; lsbs++) {
+            unsigned int k2pcomplete = k2[i - 1] | lsbs;
+            unsigned char k1msb = (unsigned char)crc32i(k2[i], (unsigned char)k2pcomplete);
+            unsigned int k2complete = crc32(k2pcomplete, k1msb);
+            if ((k2complete & 0xFFFFFFFC) == k2[i]) {
+                k2[i] = k2complete;
+                break;
+            }
+        }
+
+        if (i == 1) {
+            receiver(context, k2, len);
+        } else {
+            k2_candidate_lists_aux(k2, k3, i - 1, len, context, receiver);
+        }
+    }
+}

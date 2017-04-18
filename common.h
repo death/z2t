@@ -13,6 +13,11 @@ const unsigned short *temp_candidates(unsigned char k3);
 int k2p_partial_candidates(unsigned int k2, unsigned char k3p, unsigned int *out);
 unsigned int *k2_partial_candidates(unsigned char *k3, int k3len, int *outlen);
 
+typedef void (*list_receiver)(void *context, unsigned int *list, int len);
+void list_dump(void *context, unsigned int *list, int len);
+
+void k2_candidate_lists(unsigned int k2partial, unsigned char *k3, int k3len, void *context, list_receiver receiver);
+
 unsigned int lcg(unsigned int k1);
 unsigned int lcgi(unsigned int k1);
 
