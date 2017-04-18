@@ -17,6 +17,7 @@ typedef void (*list_receiver)(void *context, unsigned int *list, int len);
 void list_dump(void *context, unsigned int *list, int len);
 
 void k2_candidate_lists(unsigned int k2partial, unsigned char *k3, int k3len, void *context, list_receiver receiver);
+void k1_candidate_lists(unsigned char *k1msbs, int k1len, void *context, list_receiver receiver);
 
 unsigned int lcg(unsigned int k1);
 unsigned int lcgi(unsigned int k1);

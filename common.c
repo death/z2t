@@ -422,3 +422,55 @@ void k2_candidate_lists_aux(unsigned int *k2, unsigned char *k3, int i, int len,
         }
     }
 }
+
+static void k1_candidate_lists_aux(unsigned int *k1, unsigned char *msb, int i, int len, void *context, list_receiver receiver);
+
+/*
+ * Given a list (capped at MAX_BYTES) of the most significant bytes of
+ * K1 values, call the list receiver for each K1 candidate list (there
+ * will be around 2^16 of them).  The last value in each list has only
+ * 23 known bits.
+ *
+ * This isn't 1994 - we don't need no lookup tables.
+ */
+void k1_candidate_lists(unsigned char *k1msbs, int k1len, void *context, list_receiver receiver)
+{
+    unsigned int i;
+    unsigned int k1[MAX_BYTES];
+
+    if (k1len < 2) {
+        return;
+    }
+
+    for (i = 0; i < (1 << 24); i++) {
+        k1[0] = (k1msbs[0] << 24) | i;
+        if ((lcgi(k1[0]) >> 24) != k1msbs[1]) {
+            continue;
+        }
+
+        k1_candidate_lists_aux(k1, k1msbs, 1, k1len, context, receiver);
+    }
+}
+
+void k1_candidate_lists_aux(unsigned int *k1, unsigned char *msb, int i, int len, void *context, list_receiver receiver)
+{
+    unsigned int j;
+
+    k1[i] = lcgi(k1[i - 1]);
+
+    if (i + 1 == len) {
+        /*
+         * We don't know the last k1 value's least significant 9 bits.
+         */
+        k1[len - 1] &= 0xFFFFFE00;
+        receiver(context, k1, len);
+        return;
+    }
+
+    for (j = 0; j < 256; j++) {
+        if ((lcgi(k1[i]) >> 24) == msb[i + 1]) {
+            k1_candidate_lists_aux(k1, msb, i + 1, len, context, receiver);
+        }
+        k1[i]--;
+    }
+}
