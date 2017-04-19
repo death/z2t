@@ -26,13 +26,7 @@ int main(int argc, char *argv[])
         p[i] = (unsigned char)strtoul(argv[(i * 2) + 2], 0, 16);
     }
 
-    k0[3] = crc32(b[0], p[0]);
-    k0[3] >>= 8;
-    k0[3] ^= crc32(b[1], p[1]);
-    k0[3] >>= 8;
-    k0[3] ^= crc32(b[2], p[2]);
-    k0[3] >>= 8;
-    k0[3] ^= crc32(b[3], p[3]);
+    k0[3] = k0_recover4(b, p);
 
     for (i = 2; i >= 0; i--) {
         k0[i] = crc32i(k0[i + 1], p[i + 1]);

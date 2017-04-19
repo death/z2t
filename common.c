@@ -385,6 +385,26 @@ void k0_lsbs(unsigned int *k1, int k1len, unsigned char *out)
 }
 
 /*
+ * Given 4 least significant bytes of adjacent K0 values and the 4
+ * plaintext bytes for those positions, recover the full K0 value for
+ * the last position.
+ */
+unsigned int k0_recover4(unsigned char *b, unsigned char *p)
+{
+    unsigned int k0;
+
+    k0 = crc32(b[0], p[0]);
+    k0 >>= 8;
+    k0 ^= crc32(b[1], p[1]);
+    k0 >>= 8;
+    k0 ^= crc32(b[2], p[2]);
+    k0 >>= 8;
+    k0 ^= crc32(b[3], p[3]);
+
+    return k0;
+}
+
+/*
  * Dump a sequence of values to standard output.
  */
 void list_dump(void *context, unsigned int *list, int len)

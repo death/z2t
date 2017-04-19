@@ -14,6 +14,7 @@ int k2p_partial_candidates(unsigned int k2, unsigned char k3p, unsigned int *out
 unsigned int *k2_partial_candidates(unsigned char *k3, int k3len, int *outlen);
 void k1_msbs(unsigned int *k2, int k2len, unsigned char *out);
 void k0_lsbs(unsigned int *k1, int k1len, unsigned char *out);
+unsigned int k0_recover4(unsigned char *k0lsb, unsigned char *plaintext);
 
 typedef void (*list_receiver)(void *context, unsigned int *list, int len);
 void list_dump(void *context, unsigned int *list, int len);
