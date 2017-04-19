@@ -354,6 +354,20 @@ int k2_compare(const void *a, const void *b)
         return 0;
 }
 
+/*
+ * Given a sequence of K2 values, compute the most significant bytes
+ * of K1 values for each adjacent pair (resulting in k2len-1 values).
+ */
+void k1_msbs(unsigned int *k2, int k2len, unsigned char *out)
+{
+    int i;
+
+    for (i = 0; i < k2len - 1; i++) {
+        unsigned int p = k2[i];
+        unsigned int v = k2[i + 1];
+        out[i] = (unsigned char)crc32i(v, (unsigned char)p);
+    }
+}
 
 /*
  * Dump a sequence of values to standard output.

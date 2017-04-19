@@ -3,7 +3,7 @@ CFLAGS=-Wall
 LIBS=
 DEPS=common
 TARGETS=extract temp-candidates key-states crc32 k2-partial-candidates \
-	k1-msb k1-08088405-inv k1-candidate-lists k0-reconstruct-list \
+	k1-msbs k1-08088405-inv k1-candidate-lists k0-reconstruct-list \
 	k0-recover-4 key-prev-state flow-gen-message k2-candidate-lists
 
 %.o: %.c $(patsubst %, %.h, $(DEPS))
