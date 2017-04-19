@@ -1,7 +1,7 @@
 /*
  * k1-candidate-lists - Given a list of the most significant bytes of
  * K1 values, print all possible K1 candidate lists (around 2^16 of
- * them).  The last value in each list has only 23 known bits.
+ * them).  The first value in each list has only 23 known bits.
  */
 #include <stdio.h>
 
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     setup();
 
     if (argc < 3) {
-        fprintf(stderr, "usage: k1-candidate-lists <k1msb> <k1pmsb> [k1ppmsb] ...\n");
+        fprintf(stderr, "usage: k1-candidate-lists <k1msb_0> <k1msb_1> ...\n");
         return 1;
     }
 
