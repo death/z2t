@@ -8,6 +8,7 @@ enum {
 };
 
 int parse_hex_bytes(char **argv, unsigned char *out);
+void reverse_bytes(unsigned char *bytes, int len);
 
 const unsigned short *temp_candidates(unsigned char k3);
 int k2p_partial_candidates(unsigned int k2, unsigned char k3p, unsigned int *out);
@@ -39,5 +40,7 @@ void keys_init(struct keys *s, const char *pass);
 unsigned char keys_k3(struct keys *s);
 void keys_update(struct keys *s, unsigned char c);
 void keys_crypt(struct keys *s, unsigned char *out, unsigned char *in, int size);
+
+void keys_roll_back(struct keys *s, unsigned char *c, int len);
 
 #endif // Z2T_INC_COMMON_H

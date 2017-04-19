@@ -3,6 +3,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 
@@ -51,6 +52,20 @@ int parse_hex_bytes(char **argv, unsigned char *out)
     }
 
     return i;
+}
+
+/*
+ * Reverse the bytes in the buffer.
+ */
+void reverse_bytes(unsigned char *bytes, int len)
+{
+    int i;
+
+    for (i = 0; i < len / 2; i++) {
+        unsigned char c = bytes[i];
+        bytes[i] = bytes[len - i - 1];
+        bytes[len - i - 1] = c;
+    }
 }
 
 /*
@@ -521,5 +536,31 @@ void k1_candidate_lists_aux(unsigned int *k1, unsigned char *msb, int i, int len
             k1_candidate_lists_aux(k1, msb, i + 1, len, context, receiver);
         }
         k1[len - i - 1]--;
+    }
+}
+
+/*
+ * Given key state values and ciphertext bytes, go back to the initial
+ * key state values.
+ */
+void keys_roll_back(struct keys *s, unsigned char *c, int len)
+{
+    int i;
+
+    for (i = 0; i < len; i++) {
+        struct keys ps;
+        unsigned short temp;
+        unsigned char k3;
+        unsigned char p;
+
+        ps.k2 = crc32i(s->k2, s->k1 >> 24);
+        ps.k1 = lcgi(s->k1) - (s->k0 & 0xFF);
+        temp = (ps.k2 & 0xFFFF) | 3;
+        k3 = (unsigned char)((temp * (temp ^ 1)) >> 8);
+        p = c[len - i - 1] ^ k3;
+        /* Biham's paper has a typo making it into crc32. */
+        ps.k0 = crc32i(s->k0, p);
+
+        memmove(s, &ps, sizeof(struct keys));
     }
 }
