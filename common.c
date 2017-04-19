@@ -370,6 +370,21 @@ void k1_msbs(unsigned int *k2, int k2len, unsigned char *out)
 }
 
 /*
+ * Given a sequence of K1 values, compute the least significant bytes
+ * of K0 values for each adjacent pair (resulting in k1len-1 values).
+ */
+void k0_lsbs(unsigned int *k1, int k1len, unsigned char *out)
+{
+    int i;
+
+    for (i = 0; i < k1len - 1; i++) {
+        unsigned int p = k1[i];
+        unsigned int v = k1[i + 1];
+        out[i] = (unsigned char)(lcgi(v) - p);
+    }
+}
+
+/*
  * Dump a sequence of values to standard output.
  */
 void list_dump(void *context, unsigned int *list, int len)
