@@ -1,0 +1,210 @@
+* Expected solution
+
+  Initial K values after password initialization:
+
+  K0 = 8C609774
+  K1 = BD0984D8
+  K2 = 8894348C
+
+* Ciphertext
+
+  B7 89 69 85 83 FA B4 15 5E 1B A5 FB
+  76 C1 C1 50 76 F6 94 5B 4F 89 9F 21
+
+* Plaintext
+
+  84 27 45 03 67 B9 55 A4 B1 7B B4 80
+  34 5B 07 38 5C 5B D7 96 84 10 25 48
+
+* Keystream bytes (K3 bytes)
+
+  33 AE 2C 86 E4 43 E1 B1 EF 60 11 7B
+  42 9A C6 68 2A AD 43 CD CB 99 BA 69
+
+* States
+
+       k0=8C609774 k1=BD0984D8 k2=8894348C (k3=33)
+  c=84 k0=BD31928B k1=DD0EA6F0 k2=1CE4F556 (k3=AE)
+  c=27 k0=DFDDDE51 k1=218EC846 k2=CE7D006A (k3=2C)
+  c=45 k0=1A0509A3 k1=D6AA108E k2=C21982A7 (k3=86)
+  c=03 k0=D6CCA6E1 k1=E5C7932C k2=9810393E (k3=E4)
+  c=67 k0=040DEAB3 k1=FC1CDF5C k2=75F2B3A5 (k3=43)
+  c=B9 k0=E0D1E4F4 k1=52B9A191 k2=23AC950C (k3=E1)
+  c=55 k0=A131429A k1=BE9656D8 k2=254C7E35 (k3=B1)
+  c=A4 k0=C1C02CE9 k1=04373AC6 k2=51FB4C44 (k3=EF)
+  c=B1 k0=657119EA k1=ED5AEA71 k2=AF5BE000 (k3=60)
+  c=7B k0=876DD2CB k1=BDF1882D k2=B57F94D1 (k3=11)
+  c=B4 k0=C03D017F k1=E5905B5D k2=21018B21 (k3=7B)
+  c=80 k0=2DC2D28C k1=127DEF8E k2=BFF1609D (k3=42)
+  c=34 k0=C597F96C k1=9C0297E3 k2=77B8C1F6 (k3=9A)
+  c=5B k0=B87832F6 k1=F1A4E03E k2=9E132D62 (k3=C6)
+  c=07 k0=CA02BAB8 k1=73E73CCF k2=6A2E33DF (k3=68)
+  c=38 k0=ED72819A k1=B276570E k2=336933D6 (k3=2A)
+  c=5C k0=72EA1504 k1=C9C4FB5B k2=8D3B64C6 (k3=AD)
+  c=5B k0=FBA6A670 k1=B90596F8 k2=C03757C9 (k3=43)
+  c=D7 k0=484990ED k1=66960B7A k2=46A9892E (k3=CD)
+  c=96 k0=C79FE124 k1=ABDBB217 k2=9D94DE26 (k3=CB)
+  c=84 k0=D6113C09 k1=3422FAA1 k2=F324E596 (k3=99)
+  c=10 k0=64BDB9FC k1=D353DE12 k2=064591FA (k3=BA)
+  c=25 k0=FF6BD7C9 k1=2E644648 k2=81B8535C (k3=69)
+  c=48 k0=9A40D861 k1=19AC854E k2=06370D4C (k3=11)
+
+* Following the paper
+
+  We take the last known byte:
+
+  C=0x21 P=0x48 K3=C^P=0x69
+
+  In general the value of K3 depends only on 14 bits of temp.
+
+  A particular value of K3 is suggested by exactly 64 possible values
+  of temp.  In this case:
+
+  02E7 044B 050B 0817 0CBF 0CD3 10C7 137B
+  1503 1637 18AB 1AA3 1ABB 23B7 24FB 2DE3
+  2E47 34F3 3B83 4067 454F 477F 4813 4ED7
+  535F 53DB 5C9B 5E1F 5EC3 625B 628F 638B
+  65CB 6C3B 71A7 7463 7843 826F 87EF 8FAF
+  939F 9F77 A123 AB1B BD0F C7EB C8DF C96B
+  CD07 D52F DA2B DCFF DE93 DFCF E033 E23F
+  E353 E9B3 ECF7 EF87 F427 F597 FC57 FE73
+
+  The two least significant bits of K2, as well as its 16 most
+  significant bits, do not affect K3 nor temp.
+
+  (In our case, 535F fits, since K2=81B8535C.)
+
+  For each of these possibilties we complete the 16 most significant
+  bits with all possible values and get 2^22 possible values for the
+  30 most significant bits of K2.
+
+  1000 0001 1011 1000 0101 0011 0101 1100
+  AAAA AAAA AAAA AAAA BBBB BBBB BBBB BBXX
+
+  A - one possible completion.
+  B - one possible temp.
+  X - unknown.
+
+  Then, the previous K2 is (the following is an equation, not an
+  assignment):
+
+  K2p = (K2 << 8) ^ crcinvtab[MSB(K2)] ^ MSB(K1)
+
+  Considering right hand side of the equation:
+
+  1011 1000 0101 0011 0101 1100 0000 0000 ^ crcinvtab[1000 0001] ^ MSB(K1)
+  AAAA AAAA BBBB BBBB BBBB BBXX                       AAAA AAAA
+
+  In our case, crcinvtab[ 129 ] = BE16CDD4, so this results in:
+
+  0000 0110 0100 0101 1001 00?? ???? ????
+
+  (Indeed, this fits K2p=064591FA.)
+
+  For the left hand side of the equation, K2p, we again have a temp
+  list since we know K3p=BA:
+
+  00DB 031F 0347 03D7 0513 07BB 0927 0B37
+  0F5B 1477 14AF 1883 18B7 2053 2207 24CF
+  25AB 278F 2A97 2C7F 31F3 32CB 389F 3D17
+  3E23 4487 473F 49D3 4AE3 520B 54EB 566B
+  593B 5A2F 5D33 61F7 66B3 71BF 785F 807B
+  820F 86A7 876F 899B 8A4F 8CEF 9163 91FB
+  97E7 9B93 B08B B157 B7A3 BBC3 C1FF D14B
+  D543 D567 D81B E5C7 E72B EDDF F203 FB73
+
+  (In our case, 91FB fits.)
+
+  Summary: RHS 0000 0110 0100 0101 1001 00?? ???? ????
+           LHS                     1001 0001 1111 10??
+
+  We can see that 6 bits are common to both sides, so we can rule out
+  the other temps from the K3p temp list.  It is likely that we'll
+  remain with just one.
+
+  So in the likely case we end up with a single value whose 30 most
+  significant bits are known, and we can repeat the process.
+
+  Biham says: "Given this list of 30-bit values, we can complete the
+  32-bit values of K2_n, K2_n-1, ..., K2_2 (excluding K2_1) using the
+  same equation."  I don't yet understand how to complete these values
+  without creating more candidate lists.  Let us assume they are
+  completed for now.
+
+  We remain with about 2^22 lists (K2, K2p, K2pp, ...).  One of these
+  is the true list.
+
+  Calculating K1:
+
+  From the list of (K2, K2p, K2pp, ...) we can calculate the values of
+  the most significant bytes of K1:
+
+  MSB(K1) = (K2 << 8) ^ crcinvtab[MSB(K2)] ^ K2p
+
+  For example with K2=81B8535C and K2p=064591FA:
+
+  MSB(K1) = B8535C00 ^ BE16CDD4 ^ 064591FA = 00 ^ D4 ^ FA = 2E
+
+  (Indeed, this fits K1=2E644648.)
+
+  K1p + LSB(K0) = (K1 - 1) * 08088405^-1 (mod 32)
+                = (K1 - 1) * D94FA8CD
+
+  Particularly:
+
+  D353DE12 + C9 = (2E644648 - 1) * D94FA8CD
+
+  Given MSB(K1) and MSB(K1p) we can calculate about 2^16 values for
+  the full values of K1 and K1p + LSB(K0).  Given more most
+  significant bytes we can complete further K1 values, and in the end
+  we'll still end up with approximately 2^16 values.
+
+  Calculating K0:
+
+  Suppose K1n = 19AC854E
+          K1  = 2E644648
+
+  Then LSB(K0n) = (K1n - 1) * D94FA8CD - K1
+                = (19AC854E - 1) * D94FA8CD - 2E644648
+                = 61
+
+  (This fits K0=9A40D861.)
+
+  Suppose K0n = 9A40D861
+          K0  = FF6BD7C9
+
+  K0n <- crc32(K0, P)
+       = (K0 >> 8) ^ crctab[LSB(K0) ^ P]
+       = crc32(FF6BD7C9, P)
+       = FF6BD7 ^ crctab[ C9 ^ P ]
+       = FF6BD7 ^ crctab[ C9 ^ 48 ]
+       = FF6BD7 ^ crctab[ 81 ]
+       = FF6BD7 ^ 9ABFB3B6
+       = 9A40D861
+
+  CRC32 is a linear function, and from any four consecutive LSB(K0)
+  values, together with the corresponding known plaintext bytes, it is
+  possible to recover the full four K0s.
+
+  For example k0-recover-4 24 84 09 10 FC 25 C9 48 gives:
+
+  BD31928B
+  DFDDDE51
+  1A0509A3
+  D6CCA6E1
+
+  Moreover, given one full K0, it is possible to reconstruct all the
+  other K0s by calculating forward or backward, when the plaintext
+  bytes are given.
+
+  For example k0-reconstruct-list BD31928B F 27 45 03 gives:
+
+  DFDDDE51
+  1A0509A3
+  D6CCA6E1
+
+  And k0-reconstruct-list D6CCA6E1 B 03 45 27 gives:
+
+  1A0509A3
+  DFDDDE51
+  BD31928B
