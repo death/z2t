@@ -55,7 +55,7 @@
  *                 -c EE8BFE50AF78B34AB6B1A4A52A7C519FA01E7D6746E7CBCB178969C6AC89E302
  *
  * If we didn't have the EXAMPLE macro defined, it would search
- * through 388371 K2 candidate lists for this particular case.  We
+ * through 388371 K2 partial candidates for this particular case.  We
  * could run multiple searches in parallel by supplying start/end
  * values.  Another good idea in that case is to use the `tee' utility
  * to log the output to a file.
