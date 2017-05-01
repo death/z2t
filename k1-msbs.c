@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     unsigned int k2[MAX_BYTES];
     unsigned char k1msb[MAX_BYTES];
     int i;
-    int len;
+    int len = 0;
 
     setup();
 

@@ -1,7 +1,7 @@
 #define EXAMPLE
 /*
- * flow-crack - Deduce key state from known plaintext and ciphertext
- * bytes.
+ * flow-crack - Deduce possible key states from known plaintext and
+ * ciphertext bytes.
  *
  * EXAMPLE
  *
